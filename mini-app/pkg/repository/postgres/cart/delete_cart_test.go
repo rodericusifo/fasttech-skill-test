@@ -13,6 +13,7 @@ import (
 	"github.com/rodericusifo/fasttech-skill-test/mini-app/shared/constant"
 	"github.com/rodericusifo/fasttech-skill-test/mini-app/shared/helper"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
 
 func init() {
@@ -28,7 +29,7 @@ func init() {
 	mockUUID = "ac0d6ce3-ff02-4024-896b-ea0ceba32182"
 }
 
-func TestCreateCart(t *testing.T) {
+func TestDeleteCart(t *testing.T) {
 	type (
 		args struct {
 			payload *model.Cart
@@ -46,15 +47,20 @@ func TestCreateCart(t *testing.T) {
 		after  func()
 	}{
 		{
-			desc: "[ERROR] Because Missing Product Name",
+			desc: "[ERROR] Because Something Error Happens",
 			input: args{
 				payload: &model.Cart{
+					ID:          mockUUID,
 					ProductCode: "A123",
-					Quantity:    2,
+					ProductName: "Orange Fruit",
+					Quantity:    4,
+					CreatedAt:   mockDate,
+					UpdatedAt:   mockDate.Local(),
+					DeletedAt:   gorm.DeletedAt{},
 				},
 			},
 			output: result{
-				err: errors.New("missing product name"),
+				err: errors.New("error something"),
 			},
 			before: func() {
 				{
@@ -69,27 +75,21 @@ func TestCreateCart(t *testing.T) {
 				}
 				{
 					var (
-						arg1             = mockUUID
-						arg2             = "A123"
-						arg3             = ""
-						arg4             = 2
-						arg5             = mockDate
-						arg6             = mockDate
-						arg7 interface{} = nil
+						arg1 = mockUUID
 					)
 					mockQuery.ExpectBegin()
 					mockQuery.ExpectExec(
 						regexp.QuoteMeta(
 							`
-								INSERT INTO 
-									"carts" ("id","product_code","product_name","quantity","created_at","updated_at","deleted_at") 
-								VALUES 
-									($1,$2,$3,$4,$5,$6,$7)
+								DELETE FROM 
+									"carts" 
+								WHERE 
+									"carts"."id" = $1
 							`,
 						),
 					).
-						WithArgs(arg1, arg2, arg3, arg4, arg5, arg6, arg7).
-						WillReturnError(errors.New("missing product name"))
+						WithArgs(arg1).
+						WillReturnError(errors.New("error something"))
 					mockQuery.ExpectRollback()
 				}
 			},
@@ -103,12 +103,16 @@ func TestCreateCart(t *testing.T) {
 			},
 		},
 		{
-			desc: "[SUCCESS] Success Create Cart",
+			desc: "[SUCCESS] Success Delete Cart",
 			input: args{
 				payload: &model.Cart{
+					ID:          mockUUID,
 					ProductCode: "A123",
 					ProductName: "Orange Fruit",
-					Quantity:    2,
+					Quantity:    4,
+					CreatedAt:   mockDate,
+					UpdatedAt:   mockDate.Local(),
+					DeletedAt:   gorm.DeletedAt{},
 				},
 			},
 			output: result{
@@ -128,25 +132,19 @@ func TestCreateCart(t *testing.T) {
 				{
 					var (
 						arg1             = mockUUID
-						arg2             = "A123"
-						arg3             = "Orange Fruit"
-						arg4             = 2
-						arg5             = mockDate
-						arg6             = mockDate
-						arg7 interface{} = nil
 					)
 					mockQuery.ExpectBegin()
 					mockQuery.ExpectExec(
 						regexp.QuoteMeta(
 							`
-								INSERT INTO 
-									"carts" ("id","product_code","product_name","quantity","created_at","updated_at","deleted_at") 
-								VALUES 
-									($1,$2,$3,$4,$5,$6,$7)
+								DELETE FROM 
+									"carts" 
+								WHERE 
+									"carts"."id" = $1
 							`,
 						),
 					).
-						WithArgs(arg1, arg2, arg3, arg4, arg5, arg6, arg7).
+						WithArgs(arg1).
 						WillReturnResult(sqlmock.NewResult(0, 1))
 					mockQuery.ExpectCommit()
 				}
@@ -165,7 +163,7 @@ func TestCreateCart(t *testing.T) {
 		t.Run(tC.desc, func(t *testing.T) {
 			tC.before()
 
-			err := mockCartRepository.CreateCart(tC.input.payload)
+			err := mockCartRepository.DeleteCart(tC.input.payload)
 
 			assert.Equal(t, tC.output.err, err)
 

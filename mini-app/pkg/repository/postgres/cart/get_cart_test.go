@@ -8,6 +8,7 @@ import (
 
 	"bou.ke/monkey"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/rodericusifo/fasttech-skill-test/mini-app/libs/types"
 	"github.com/rodericusifo/fasttech-skill-test/mini-app/libs/util"
 	"github.com/rodericusifo/fasttech-skill-test/mini-app/pkg/model"
 	"github.com/rodericusifo/fasttech-skill-test/mini-app/shared/constant"
@@ -28,13 +29,15 @@ func init() {
 	mockUUID = "ac0d6ce3-ff02-4024-896b-ea0ceba32182"
 }
 
-func TestCreateCart(t *testing.T) {
+func TestGetCart(t *testing.T) {
 	type (
 		args struct {
+			query   *types.Query
 			payload *model.Cart
 		}
 		result struct {
-			err error
+			value *model.Cart
+			err   error
 		}
 	)
 
@@ -46,15 +49,23 @@ func TestCreateCart(t *testing.T) {
 		after  func()
 	}{
 		{
-			desc: "[ERROR] Because Missing Product Name",
+			desc: "[ERROR] Because Something Error Happens",
 			input: args{
+				query: &types.Query{
+					SelectColumns: []string{
+						"id",
+						"product_code",
+						"product_name",
+						"quantity",
+					},
+				},
 				payload: &model.Cart{
 					ProductCode: "A123",
-					Quantity:    2,
 				},
 			},
 			output: result{
-				err: errors.New("missing product name"),
+				value: nil,
+				err:   errors.New("something error"),
 			},
 			before: func() {
 				{
@@ -69,28 +80,27 @@ func TestCreateCart(t *testing.T) {
 				}
 				{
 					var (
-						arg1             = mockUUID
-						arg2             = "A123"
-						arg3             = ""
-						arg4             = 2
-						arg5             = mockDate
-						arg6             = mockDate
-						arg7 interface{} = nil
+						arg1 = "A123"
 					)
-					mockQuery.ExpectBegin()
-					mockQuery.ExpectExec(
+					mockQuery.ExpectQuery(
 						regexp.QuoteMeta(
 							`
-								INSERT INTO 
-									"carts" ("id","product_code","product_name","quantity","created_at","updated_at","deleted_at") 
-								VALUES 
-									($1,$2,$3,$4,$5,$6,$7)
+								SELECT
+									"id","product_code","product_name","quantity","created_at","updated_at"
+								FROM
+									"carts"
+								WHERE
+									product_code = $1
+								AND
+									"carts"."deleted_at" IS NULL
+								ORDER BY
+									"carts"."id"
+								LIMIT 1
 							`,
 						),
 					).
-						WithArgs(arg1, arg2, arg3, arg4, arg5, arg6, arg7).
-						WillReturnError(errors.New("missing product name"))
-					mockQuery.ExpectRollback()
+						WithArgs(arg1).
+						WillReturnError(errors.New("something error"))
 				}
 			},
 			after: func() {
@@ -103,15 +113,29 @@ func TestCreateCart(t *testing.T) {
 			},
 		},
 		{
-			desc: "[SUCCESS] Success Create Cart",
+			desc: "[SUCCESS] Success Get Cart",
 			input: args{
+				query: &types.Query{
+					SelectColumns: []string{
+						"id",
+						"product_code",
+						"product_name",
+						"quantity",
+					},
+				},
 				payload: &model.Cart{
 					ProductCode: "A123",
-					ProductName: "Orange Fruit",
-					Quantity:    2,
 				},
 			},
 			output: result{
+				value: &model.Cart{
+					ID:          mockUUID,
+					ProductCode: "A123",
+					ProductName: "Orange Fruit",
+					Quantity:    4,
+					CreatedAt:   mockDate,
+					UpdatedAt:   mockDate,
+				},
 				err: nil,
 			},
 			before: func() {
@@ -127,28 +151,31 @@ func TestCreateCart(t *testing.T) {
 				}
 				{
 					var (
-						arg1             = mockUUID
-						arg2             = "A123"
-						arg3             = "Orange Fruit"
-						arg4             = 2
-						arg5             = mockDate
-						arg6             = mockDate
-						arg7 interface{} = nil
+						arg1         = "A123"
+						rowsInstance = sqlmock.NewRows([]string{"id", "product_code", "product_name", "quantity", "created_at", "updated_at"})
 					)
-					mockQuery.ExpectBegin()
-					mockQuery.ExpectExec(
+
+					rowsInstance.AddRow(mockUUID, "A123", "Orange Fruit", 4, mockDate, mockDate)
+
+					mockQuery.ExpectQuery(
 						regexp.QuoteMeta(
 							`
-								INSERT INTO 
-									"carts" ("id","product_code","product_name","quantity","created_at","updated_at","deleted_at") 
-								VALUES 
-									($1,$2,$3,$4,$5,$6,$7)
+								SELECT
+									"id","product_code","product_name","quantity","created_at","updated_at"
+								FROM
+									"carts"
+								WHERE
+									product_code = $1
+								AND
+									"carts"."deleted_at" IS NULL
+								ORDER BY
+									"carts"."id"
+								LIMIT 1
 							`,
 						),
 					).
-						WithArgs(arg1, arg2, arg3, arg4, arg5, arg6, arg7).
-						WillReturnResult(sqlmock.NewResult(0, 1))
-					mockQuery.ExpectCommit()
+						WithArgs(arg1).
+						WillReturnRows(rowsInstance)
 				}
 			},
 			after: func() {
@@ -165,9 +192,10 @@ func TestCreateCart(t *testing.T) {
 		t.Run(tC.desc, func(t *testing.T) {
 			tC.before()
 
-			err := mockCartRepository.CreateCart(tC.input.payload)
+			result, err := mockCartRepository.GetCart(tC.input.query, tC.input.payload)
 
 			assert.Equal(t, tC.output.err, err)
+			assert.Equal(t, tC.output.value, result)
 
 			tC.after()
 		})
