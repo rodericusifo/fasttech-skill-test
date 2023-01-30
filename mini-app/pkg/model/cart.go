@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/rodericusifo/fasttech-skill-test/mini-app/libs/util"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +18,7 @@ type Cart struct {
 }
 
 func (u *Cart) BeforeCreate(tx *gorm.DB) error {
-	u.ID = uuid.New().String()
+	u.ID = util.GenerateUUID()
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()
 	return nil
