@@ -49,3 +49,11 @@ make start-dev
 ### Documentation: Mini App
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/10344918-e617f456-d76a-4635-9e44-f44247265b08?action=collection%2Ffork&collection-url=entityId%3D10344918-e617f456-d76a-4635-9e44-f44247265b08%26entityType%3Dcollection%26workspaceId%3D43df7931-feec-460c-8889-25210781dc3f)
+
+### Unit Test
+
+Just Running
+
+```bash
+make test-cover
+```
