@@ -49,7 +49,7 @@ func TestGetCart(t *testing.T) {
 		after  func()
 	}{
 		{
-			desc: "[ERROR] Because Something Error Happens",
+			desc: "[ERROR]_because_something_error_happens",
 			input: args{
 				query: &types.Query{
 					SelectColumns: []string{
@@ -113,7 +113,7 @@ func TestGetCart(t *testing.T) {
 			},
 		},
 		{
-			desc: "[SUCCESS] Success Get Cart",
+			desc: "[SUCCESS]_success_get_cart",
 			input: args{
 				query: &types.Query{
 					SelectColumns: []string{

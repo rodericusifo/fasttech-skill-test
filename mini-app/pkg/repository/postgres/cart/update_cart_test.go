@@ -47,7 +47,7 @@ func TestUpdateCart(t *testing.T) {
 		after  func()
 	}{
 		{
-			desc: "[ERROR] Because Something Error Happens",
+			desc: "[ERROR]_because_something_error_happens",
 			input: args{
 				payload: &model.Cart{
 					ID:          mockUUID,
@@ -113,7 +113,7 @@ func TestUpdateCart(t *testing.T) {
 			},
 		},
 		{
-			desc: "[SUCCESS] Success Update Cart",
+			desc: "[SUCCESS]_success_update_cart",
 			input: args{
 				payload: &model.Cart{
 					ID:          mockUUID,

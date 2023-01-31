@@ -46,7 +46,7 @@ func TestCreateCart(t *testing.T) {
 		after  func()
 	}{
 		{
-			desc: "[ERROR] Because Missing Product Name",
+			desc: "[ERROR]_because_missing_product_name",
 			input: args{
 				payload: &model.Cart{
 					ProductCode: "A123",
@@ -103,7 +103,7 @@ func TestCreateCart(t *testing.T) {
 			},
 		},
 		{
-			desc: "[SUCCESS] Success Create Cart",
+			desc: "[SUCCESS]_success_create_cart",
 			input: args{
 				payload: &model.Cart{
 					ProductCode: "A123",

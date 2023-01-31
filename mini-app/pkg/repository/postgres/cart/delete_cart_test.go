@@ -47,7 +47,7 @@ func TestDeleteCart(t *testing.T) {
 		after  func()
 	}{
 		{
-			desc: "[ERROR] Because Something Error Happens",
+			desc: "[ERROR]_because_something_error_happens",
 			input: args{
 				payload: &model.Cart{
 					ID:          mockUUID,
@@ -103,7 +103,7 @@ func TestDeleteCart(t *testing.T) {
 			},
 		},
 		{
-			desc: "[SUCCESS] Success Delete Cart",
+			desc: "[SUCCESS]_success_delete_cart",
 			input: args{
 				payload: &model.Cart{
 					ID:          mockUUID,

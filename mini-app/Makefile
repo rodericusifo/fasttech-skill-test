@@ -1,6 +1,15 @@
+gen-mocks:
+	@echo "  >  Generate Mocks..."
+	mockery --all
+
 gen-wire:
 	@echo "  >  Generate Wire..."
 	wire wire/wire.go
+
+#TEST
+test-cover: gen-mocks
+	@echo "  >  Run Test Cover..."
+	go test ./... -cover -coverprofile=coverage.out
 
 # START APPLICATION
 start-dev: gen-wire
