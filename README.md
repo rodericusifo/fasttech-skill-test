@@ -24,21 +24,23 @@ go version
 # go version go1.19
 ```
 
-- Step 2: Install Wire by running
+- Step 2: Install Mockery. Docs on this [LINK](https://github.com/vektra/mockery)
+
+- Step 3: Install Wire by running
 
 ```bash
 go install github.com/google/wire/cmd/wire@latest
 ```
 
-- Step 3: Install Depedencies by Running
+- Step 4: Install Depedencies by Running
 
 ```bash
 go mod tidy
 ```
 
-- Step 4: Copy `<dev|stag|prod|test>`.application.yaml.example to `<dev|stag|prod|test>`.application.yaml. `NOTE`: choose type dev
+- Step 5: Copy `<dev|stag|prod|test>`.application.yaml.example to `<dev|stag|prod|test>`.application.yaml. `NOTE`: choose type dev
 
-- Step 5: Running the grpc server
+- Step 6: Running the server
 
 ```bash
 make start-dev
