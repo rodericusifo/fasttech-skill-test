@@ -8,6 +8,15 @@ import (
 func DefineTwoStrings(str1 string, str2 string) bool {
 	opt := 0
 
+	if len(str1) == len(str2) {
+		for i := 0; i < len(str1); i++ {
+			if string(str1[i]) != string(str2[i]) {
+				opt++
+			}
+		}
+		return opt == 1
+	}
+
 	mpCharStr1, mpCharStr2 := make(map[string]int), make(map[string]int)
 
 	for _, char := range str1 {
@@ -56,4 +65,10 @@ func main() {
 	fmt.Println("GIVEN INPUT 1:", "telkom")
 	fmt.Println("GIVEN INPUT 2:", "tlkom")
 	fmt.Println("RESULT:", DefineTwoStrings("telkom", "tlkom"))
+
+	fmt.Println("")
+
+	fmt.Println("GIVEN INPUT 1:", "telekom")
+	fmt.Println("GIVEN INPUT 2:", "telecom")
+	fmt.Println("RESULT:", DefineTwoStrings("talekom", "telecom"))
 }
